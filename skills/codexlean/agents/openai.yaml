@@ -1,0 +1,6 @@
+interface:
+  display_name: "CodexLean"
+  short_description: "Reversible terminal-output compression for Codex"
+  default_prompt: "Use CodexLean for noisy commands and retrieve exact omitted context before consequential decisions."
+policy:
+  allow_implicit_invocation: true

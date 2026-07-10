@@ -1,0 +1,16 @@
+﻿case,label_ko,category,raw_tokens,output_tokens,saved_tokens,savings_pct,transformed,strict_visible_pass,exact_available,artifact_created,fallback_reason
+CL/pytest-pass,Pytest 성공,pytest,1748,286,1462,83.638,True,True,True,True,
+CL/pytest-fail,Pytest 실패,pytest,1614,337,1277,79.12,True,True,True,True,
+CL/logs,대량 운영 로그,log,32613,1449,31164,95.557,True,True,True,True,
+CL/json-array,대형 JSON 배열,json,21530,556,20974,97.418,True,True,True,True,
+CL/search,대규모 검색 결과,search,15958,2598,13360,83.72,True,True,True,True,
+CL/tree,파일 트리,tree,11717,353,11364,96.987,True,True,True,True,
+CL/generic-progress,진행률 로그,generic,4893,86,4807,98.242,True,True,True,True,
+CL/git-status,Git status,git-status,1037,789,248,23.915,True,True,True,True,
+CL/git-diff-protected,보호된 Git diff,git-diff,5280,5280,0,0.0,False,True,True,False,filter found no safe reduction
+CL/secret-passthrough,민감정보 로그,log,811,811,0,0.0,False,True,True,False,probable secret: exact-recovery storage not permitted
+EXT/pytest-failure,외부 Pytest 실패,pytest,1237,562,675,54.568,True,True,True,True,
+EXT/ripgrep-results,외부 ripgrep 검색 결과,search,1304,607,697,53.451,True,True,True,True,
+EXT/json-api,외부 JSON API 응답,json,2174,436,1738,79.945,True,True,True,True,
+EXT/git-diff,외부 Git diff,git-diff,498,498,0,0.0,False,True,True,False,filter found no safe reduction
+EXT/assistant-answer,짧은 답변,assistant,75,75,0,0.0,False,True,True,False,below compression threshold

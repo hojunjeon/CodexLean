@@ -1,0 +1,10 @@
+CodexLean 0.1.1
+
+This implementation is original and does not vendor third-party source code.
+Its architecture was informed by publicly documented patterns from:
+
+- JuliusBrussee/caveman (MIT): concise model responses with technical literals preserved.
+- rtk-ai/rtk (Apache-2.0): command-aware filtering, exit-code preservation, fixtures, and raw-output recovery hints.
+- headroomlabs-ai/headroom (Apache-2.0): reversible compress-cache-retrieve context handling and conservative content routing.
+
+OpenAI Codex is a trademark/product name of OpenAI. CodexLean is an independent utility and is not an official OpenAI product.

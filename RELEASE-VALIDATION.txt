@@ -1,0 +1,28 @@
+CodexLean 0.1.1 release validation
+Date: 2026-07-10
+Platform: Linux-4.4.0-x86_64-with-glibc2.41
+Build Python: Python 3.13.5
+Installed CLI: codexlean 0.1.1
+Source tests: 33 passed
+Python compileall: pass
+Wheel clean-venv install: pass
+Wheel pip check: No broken requirements found.
+Wheel bundled Skill files: pass
+Project Skill install/doctor: pass
+  [OK] Python: 3.13.5
+  [OK] codexlean on PATH
+  [OK] project .agents/skills/codexlean
+  [OK] managed AGENTS.md guidance
+Wrapped failing exit code: 7 (expected 7)
+Decisive error retained: pass
+Exact artifact byte recovery: pass
+Built-in benchmark quality failures: 0
+Built-in safe benchmark exact-byte saving: 88.0%
+Built-in safe benchmark cl100k token saving: 87.1%
+Cross benchmark: 102,489 -> 14,723 cl100k tokens (85.635% saved)
+Cross benchmark strict visible gates: 15/15
+Cross benchmark exact original availability: 15/15
+Search regression anchor src/auth.py:77 + validate_expiry: pass
+Sensitive-output persistence violations: 0
+Authenticated Codex end-to-end session: not available in build environment
+Provider-reported billing token A/B: not measured
