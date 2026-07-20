@@ -99,6 +99,7 @@ jobs:
           }
           if (-not (Test-Path $env:CODEXLEAN_HOME)) { throw "uninstaller deleted installation after failure" }
           Remove-Item -Recurse -Force $env:CODEXLEAN_HOME
+          $global:LASTEXITCODE = 0
 
   package:
     runs-on: ubuntu-latest
