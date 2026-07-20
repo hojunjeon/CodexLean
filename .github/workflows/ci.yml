@@ -70,9 +70,8 @@ jobs:
           New-Item -ItemType Directory -Force $env:CODEXLEAN_PROJECT, $env:CODEXLEAN_BIN_DIR | Out-Null
           $UnrelatedLauncher = Join-Path $env:CODEXLEAN_BIN_DIR "codexlean.cmd"
           Set-Content -NoNewline $UnrelatedLauncher "unrelated"
-          $CollisionBlocked = $false
-          try { .\windows\install.ps1 } catch { $CollisionBlocked = $true }
-          if (-not $CollisionBlocked) { throw "installer replaced an unrelated launcher" }
+          & pwsh -NoProfile -File .\windows\install.ps1
+          if ($LASTEXITCODE -eq 0) { throw "installer replaced an unrelated launcher" }
           if ((Get-Content $UnrelatedLauncher -Raw) -ne "unrelated") { throw "unrelated launcher changed" }
           Remove-Item $UnrelatedLauncher
           .\windows\install.ps1
@@ -86,9 +85,8 @@ jobs:
           New-Item -ItemType Directory -Force $FakeScripts | Out-Null
           Set-Content (Join-Path $env:CODEXLEAN_HOME ".codexlean-install") "managed"
           Copy-Item "$env:SystemRoot\System32\where.exe" (Join-Path $FakeScripts "codexlean.exe")
-          $RemovalBlocked = $false
-          try { .\windows\uninstall.ps1 } catch { $RemovalBlocked = $true }
-          if (-not $RemovalBlocked) { throw "uninstaller ignored integration removal failure" }
+          & pwsh -NoProfile -File .\windows\uninstall.ps1
+          if ($LASTEXITCODE -eq 0) { throw "uninstaller ignored integration removal failure" }
           if (-not (Test-Path $env:CODEXLEAN_HOME)) { throw "uninstaller deleted installation after failure" }
           Remove-Item -Recurse -Force $env:CODEXLEAN_HOME
 

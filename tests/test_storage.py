@@ -1,5 +1,6 @@
 import sqlite3
 import stat
+import os
 from pathlib import Path
 
 import pytest
@@ -23,6 +24,7 @@ def test_existing_custom_store_directory_permissions_are_preserved(tmp_path: Pat
     assert stat.S_IMODE(parent.stat().st_mode) == before
 
 
+@pytest.mark.skipif(os.name == "nt", reason="XDG cache paths are POSIX-only")
 def test_relative_xdg_cache_home_is_ignored(monkeypatch, tmp_path: Path):
     monkeypatch.delenv("CODEXLEAN_STORE", raising=False)
     monkeypatch.setenv("XDG_CACHE_HOME", "relative-cache")
