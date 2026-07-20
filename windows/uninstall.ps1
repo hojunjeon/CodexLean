@@ -5,6 +5,9 @@ $InstallHome = if ($env:CODEXLEAN_HOME) { $env:CODEXLEAN_HOME } else { Join-Path
 $BinDir = if ($env:CODEXLEAN_BIN_DIR) { $env:CODEXLEAN_BIN_DIR } else { Join-Path $HOME ".local\bin" }
 $Marker = Join-Path $InstallHome ".codexlean-install"
 $CodexLean = Join-Path $InstallHome "venv\Scripts\codexlean.exe"
+$CmdPath = Join-Path $BinDir "codexlean.cmd"
+$LauncherMarker = "$CmdPath.codexlean-owned"
+$ExpectedLauncher = "@echo off`r`n`"$CodexLean`" %*`r`n"
 $Scope = if ($env:CODEXLEAN_SCOPE) { $env:CODEXLEAN_SCOPE } else { "user" }
 if ($Scope -notin @("user", "project")) { throw "CODEXLEAN_SCOPE must be user or project." }
 
@@ -25,10 +28,15 @@ if (Test-Path $CodexLean) {
     if ($LASTEXITCODE -ne 0) { throw "Codex integration removal failed." }
 }
 
-$CmdPath = Join-Path $BinDir "codexlean.cmd"
 if (Test-Path $CmdPath) {
-    $Expected = "`"$CodexLean`" %*"
-    if ((Get-Content $CmdPath -Raw).Contains($Expected)) { Remove-Item -Force $CmdPath }
+    $OwnedLauncher = (Get-Content $CmdPath -Raw) -eq $ExpectedLauncher
+    if (Test-Path $LauncherMarker -PathType Leaf) {
+        $OwnedLauncher = $OwnedLauncher -or ((Get-Content $LauncherMarker -Raw).Trim() -eq $CodexLean)
+    }
+    if ($OwnedLauncher) {
+        Remove-Item -Force $CmdPath
+        if (Test-Path $LauncherMarker) { Remove-Item -Force $LauncherMarker }
+    }
 }
 if (Test-Path $InstallHome) { Remove-Item -Recurse -Force $InstallHome }
 Write-Host "Removed CodexLean from $InstallHome"
