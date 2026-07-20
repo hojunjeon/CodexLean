@@ -7,6 +7,7 @@ INSTALL_HOME=${CODEXLEAN_HOME:-"$DATA_HOME/codexlean"}
 BIN_DIR=${CODEXLEAN_BIN_DIR:-"$HOME/.local/bin"}
 VENV="$INSTALL_HOME/venv"
 MARKER="$INSTALL_HOME/.codexlean-install"
+LAUNCHER="$BIN_DIR/codexlean"
 PYTHON=${PYTHON:-python3}
 SCOPE=${CODEXLEAN_SCOPE:-user}
 
@@ -25,6 +26,14 @@ if [ -e "$INSTALL_HOME" ] && [ ! -f "$MARKER" ]; then
   exit 1
 fi
 
+if [ -e "$LAUNCHER" ] || [ -L "$LAUNCHER" ]; then
+  TARGET=$(readlink "$LAUNCHER" 2>/dev/null || true)
+  if [ "$TARGET" != "$VENV/bin/codexlean" ]; then
+    printf '%s\n' "codexlean: refusing to replace unrelated launcher: $LAUNCHER" >&2
+    exit 1
+  fi
+fi
+
 command -v "$PYTHON" >/dev/null 2>&1 || {
   printf '%s\n' "codexlean: Python 3.10+ is required" >&2
   exit 1
@@ -38,7 +47,7 @@ mkdir -p "$INSTALL_HOME" "$BIN_DIR"
 printf '%s\n' "CodexLean managed installation" > "$MARKER"
 "$PYTHON" -m venv "$VENV"
 "$VENV/bin/python" -m pip install --disable-pip-version-check "$ROOT"
-ln -sfn "$VENV/bin/codexlean" "$BIN_DIR/codexlean"
+ln -sfn "$VENV/bin/codexlean" "$LAUNCHER"
 
 set -- install --scope "$SCOPE"
 if [ "$SCOPE" = project ]; then

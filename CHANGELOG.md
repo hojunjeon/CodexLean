@@ -7,6 +7,8 @@
 - Added Linux installation smoke coverage and a Windows CI lane.
 - Fixed Windows timeout termination where `signal.SIGKILL` is unavailable.
 - Close every SQLite connection deterministically so Windows can remove temporary benchmark stores.
+- Protect unrelated launchers and caller-owned storage-directory permissions.
+- Added Skill-drift, checksum, source-distribution, and native installer safety gates to CI.
 - Kept one shared Python core to prevent platform implementations from drifting.
 
 ## 0.1.1 — 2026-07-10

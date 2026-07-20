@@ -1,6 +1,6 @@
 {
   "summary": {
-    "version": "0.1.1",
+    "version": "0.2.0",
     "profile": "safe",
     "token_counter": "tiktoken:cl100k_base_offline",
     "case_count": 15,

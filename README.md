@@ -276,7 +276,7 @@ python3 benchmarks/cross_benchmark.py
 
 ## 검증 범위와 한계
 
-- Python 3.11/Linux에서 자동 테스트 **38개**와 격리 설치→실행→제거 smoke test를 통과했습니다.
+- Python 3.11/Linux에서 자동 테스트 **41개**와 격리 설치→실행→제거 smoke test를 통과했습니다.
 - GitHub Actions는 Python 3.10/3.13의 Linux·Windows 테스트와 두 플랫폼 설치 smoke test를 실행합니다.
 - Wheel 설치, CLI 버전, Codex Skill 설치·진단, 명령 종료 코드, 부분 타임아웃 출력, 원문 바이트 복구를 검증합니다.
 - 15개 교차 코퍼스에서 엄격 1차 품질 게이트 **15/15**, 정확 원문 가용 **15/15**를 확인했습니다.

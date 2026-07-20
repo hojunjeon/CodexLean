@@ -1,9 +1,10 @@
 import sqlite3
+import stat
 from pathlib import Path
 
 import pytest
 
-from codexlean.storage import ArtifactStore
+from codexlean.storage import ArtifactStore, default_store_path
 
 
 def test_store_connections_close_after_context(tmp_path: Path):
@@ -12,6 +13,21 @@ def test_store_connections_close_after_context(tmp_path: Path):
         conn.execute("SELECT 1").fetchone()
     with pytest.raises(sqlite3.ProgrammingError):
         conn.execute("SELECT 1")
+
+
+def test_existing_custom_store_directory_permissions_are_preserved(tmp_path: Path):
+    parent = tmp_path / "shared"
+    parent.mkdir(mode=0o750)
+    before = stat.S_IMODE(parent.stat().st_mode)
+    ArtifactStore(parent / "artifacts.sqlite3")
+    assert stat.S_IMODE(parent.stat().st_mode) == before
+
+
+def test_relative_xdg_cache_home_is_ignored(monkeypatch, tmp_path: Path):
+    monkeypatch.delenv("CODEXLEAN_STORE", raising=False)
+    monkeypatch.setenv("XDG_CACHE_HOME", "relative-cache")
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: tmp_path))
+    assert default_store_path() == tmp_path / ".cache" / "codexlean" / "artifacts.sqlite3"
 
 
 def test_exact_roundtrip_and_prefix_lookup(tmp_path: Path):

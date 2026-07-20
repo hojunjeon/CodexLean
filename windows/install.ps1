@@ -8,6 +8,8 @@ $Venv = Join-Path $InstallHome "venv"
 $Marker = Join-Path $InstallHome ".codexlean-install"
 $Python = Join-Path $Venv "Scripts\python.exe"
 $CodexLean = Join-Path $Venv "Scripts\codexlean.exe"
+$CmdPath = Join-Path $BinDir "codexlean.cmd"
+$ExpectedLauncher = "`"$CodexLean`" %*"
 $Scope = if ($env:CODEXLEAN_SCOPE) { $env:CODEXLEAN_SCOPE } else { "user" }
 if ($Scope -notin @("user", "project")) { throw "CODEXLEAN_SCOPE must be user or project." }
 
@@ -16,6 +18,9 @@ $InstallRoot = [IO.Path]::GetPathRoot($InstallFullPath).TrimEnd('\')
 if ($InstallFullPath -eq $InstallRoot) { throw "Refusing to use a drive root as CODEXLEAN_HOME." }
 if ((Test-Path $InstallHome) -and -not (Test-Path $Marker -PathType Leaf)) {
     throw "Refusing to overwrite unrecognized directory: $InstallHome"
+}
+if ((Test-Path $CmdPath) -and -not (Get-Content $CmdPath -Raw).Contains($ExpectedLauncher)) {
+    throw "Refusing to replace unrelated launcher: $CmdPath"
 }
 
 $Launcher = Get-Command py -ErrorAction SilentlyContinue
@@ -30,7 +35,6 @@ if ($LASTEXITCODE -ne 0) { throw "Failed to create the CodexLean virtual environ
 & $Python -m pip install --disable-pip-version-check $Root
 if ($LASTEXITCODE -ne 0) { throw "Failed to install CodexLean." }
 
-$CmdPath = Join-Path $BinDir "codexlean.cmd"
 $CmdText = "@echo off`r`n`"$CodexLean`" %*`r`n"
 [IO.File]::WriteAllText($CmdPath, $CmdText, [Text.UTF8Encoding]::new($false))
 

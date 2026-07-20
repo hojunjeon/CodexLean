@@ -1,6 +1,6 @@
 # Validation record
 
-Build environment: Python 3.13.5, Linux container, 2026-07-10.
+Current validation environment: Python 3.11.15, Linux aarch64, 2026-07-21. Native Windows coverage runs in GitHub Actions on Python 3.10 and 3.13.
 
 ## Automated tests
 
@@ -13,7 +13,7 @@ PYTHONPATH=src pytest -q
 Result before release packaging:
 
 ```text
-33 passed
+41 passed
 ```
 
 Covered behavior:
@@ -37,6 +37,9 @@ Covered behavior:
 - timeout code 124 with already-emitted partial output retained
 - zero-length tail selection and mutually exclusive retrieval selectors
 - bundled benchmark quality gates
+- Linux and Windows platform layout, executable mode, and shared Skill drift gate
+- deterministic SQLite connection closure and caller-owned directory permission preservation
+- relative XDG cache path rejection
 
 ## Benchmark
 
@@ -61,7 +64,7 @@ The figures describe the included corpus. They are not a guarantee for arbitrary
 
 ## Cross benchmark
 
-The expanded ON/OFF suite combines the 10 built-in fixtures with five independently shaped pytest, ripgrep, JSON API, Git diff, and short-response cases. Version 0.1.1 produced 102,489 → 14,723 cl100k tokens (85.6% visible reduction), with 15/15 strict visible gates and 15/15 exact-original availability. See `benchmarks/cross_results.md`.
+The expanded ON/OFF suite combines the 10 built-in fixtures with five independently shaped pytest, ripgrep, JSON API, Git diff, and short-response cases. Version 0.2.0 produced 102,489 → 14,723 cl100k tokens (85.6% visible reduction), with 15/15 strict visible gates and 15/15 exact-original availability. See `benchmarks/cross_results.md`.
 
 ## Release packaging checks
 
@@ -87,4 +90,4 @@ An authenticated Codex CLI binary/session was unavailable in the build environme
 - provider-reported input/output token A/B measurements;
 - task-success non-inferiority on SWE-bench or a private repository corpus;
 - Codex desktop/UI behavior;
-- Windows-native child-process tests beyond portable Python logic and static installer review.
+- authenticated Windows desktop/Codex UI behavior beyond the native CLI and installer CI lanes.

@@ -64,18 +64,21 @@ def default_store_path() -> Path:
     if os.name == "nt":
         base = Path(os.getenv("LOCALAPPDATA", Path.home() / "AppData" / "Local"))
         return base / "CodexLean" / "artifacts.sqlite3"
-    base = Path(os.getenv("XDG_CACHE_HOME", Path.home() / ".cache"))
+    configured = os.getenv("XDG_CACHE_HOME")
+    base = Path(configured) if configured and Path(configured).is_absolute() else Path.home() / ".cache"
     return base / "codexlean" / "artifacts.sqlite3"
 
 
 class ArtifactStore:
     def __init__(self, path: Path | None = None) -> None:
         self.path = (path or default_store_path()).expanduser()
+        parent_existed = self.path.parent.exists()
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            os.chmod(self.path.parent, stat.S_IRWXU)
-        except OSError:
-            pass
+        if not parent_existed:
+            try:
+                os.chmod(self.path.parent, stat.S_IRWXU)
+            except OSError:
+                pass
         self._init_db()
         self._expire_default()
 

@@ -1,0 +1,8 @@
+include LICENSE
+include NOTICE
+include README.md
+include CHANGELOG.md
+recursive-include linux *.md *.sh
+recursive-include windows *.md *.ps1
+recursive-include skills *
+recursive-include tests *.py

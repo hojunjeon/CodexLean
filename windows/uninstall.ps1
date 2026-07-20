@@ -22,6 +22,7 @@ if (Test-Path $CodexLean) {
         $Args += @("--project", $Project)
     }
     & $CodexLean @Args
+    if ($LASTEXITCODE -ne 0) { throw "Codex integration removal failed." }
 }
 
 $CmdPath = Join-Path $BinDir "codexlean.cmd"

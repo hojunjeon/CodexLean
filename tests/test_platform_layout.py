@@ -34,6 +34,16 @@ def test_package_and_runtime_versions_match():
     assert f'version = "{codexlean.__version__}"' in project
 
 
+def test_packaged_skill_matches_repository_source():
+    source = ROOT / "skills" / "codexlean"
+    packaged = ROOT / "src" / "codexlean" / "resources" / "skill" / "codexlean"
+    source_files = {path.relative_to(source) for path in source.rglob("*") if path.is_file()}
+    packaged_files = {path.relative_to(packaged) for path in packaged.rglob("*") if path.is_file()}
+    assert source_files == packaged_files
+    for relative in source_files:
+        assert (source / relative).read_bytes() == (packaged / relative).read_bytes()
+
+
 def test_root_readme_routes_users_to_both_platforms():
     readme = (ROOT / "README.md").read_text("utf-8")
     for path in ("./linux/install.sh", ".\\windows\\install.ps1"):

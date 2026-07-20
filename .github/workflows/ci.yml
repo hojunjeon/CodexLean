@@ -46,7 +46,14 @@ jobs:
           export CODEXLEAN_BIN_DIR="$RUNNER_TEMP/codexlean-bin"
           export CODEXLEAN_SCOPE=project
           export CODEXLEAN_PROJECT="$RUNNER_TEMP/codexlean-project"
-          mkdir -p "$CODEXLEAN_PROJECT"
+          mkdir -p "$CODEXLEAN_PROJECT" "$CODEXLEAN_BIN_DIR"
+          printf '%s\n' unrelated > "$CODEXLEAN_BIN_DIR/codexlean"
+          if ./linux/install.sh; then
+            echo "installer replaced an unrelated launcher" >&2
+            exit 1
+          fi
+          grep -Fx unrelated "$CODEXLEAN_BIN_DIR/codexlean"
+          rm "$CODEXLEAN_BIN_DIR/codexlean"
           ./linux/install.sh
           "$CODEXLEAN_BIN_DIR/codexlean" --version
           "$CODEXLEAN_BIN_DIR/codexlean" run -- python -c "print('linux-smoke-ok')"
@@ -60,12 +67,30 @@ jobs:
           $env:CODEXLEAN_BIN_DIR = Join-Path $env:RUNNER_TEMP "codexlean-bin"
           $env:CODEXLEAN_SCOPE = "project"
           $env:CODEXLEAN_PROJECT = Join-Path $env:RUNNER_TEMP "codexlean-project"
-          New-Item -ItemType Directory -Force $env:CODEXLEAN_PROJECT | Out-Null
+          New-Item -ItemType Directory -Force $env:CODEXLEAN_PROJECT, $env:CODEXLEAN_BIN_DIR | Out-Null
+          $UnrelatedLauncher = Join-Path $env:CODEXLEAN_BIN_DIR "codexlean.cmd"
+          Set-Content -NoNewline $UnrelatedLauncher "unrelated"
+          $CollisionBlocked = $false
+          try { .\windows\install.ps1 } catch { $CollisionBlocked = $true }
+          if (-not $CollisionBlocked) { throw "installer replaced an unrelated launcher" }
+          if ((Get-Content $UnrelatedLauncher -Raw) -ne "unrelated") { throw "unrelated launcher changed" }
+          Remove-Item $UnrelatedLauncher
           .\windows\install.ps1
           & "$env:CODEXLEAN_BIN_DIR\codexlean.cmd" --version
           & "$env:CODEXLEAN_BIN_DIR\codexlean.cmd" run -- python -c "print('windows-smoke-ok')"
           .\windows\uninstall.ps1
           if (Test-Path $env:CODEXLEAN_HOME) { throw "uninstall left CODEXLEAN_HOME behind" }
+          $env:CODEXLEAN_HOME = Join-Path $env:RUNNER_TEMP "failure-home"
+          $env:CODEXLEAN_BIN_DIR = Join-Path $env:RUNNER_TEMP "failure-bin"
+          $FakeScripts = Join-Path $env:CODEXLEAN_HOME "venv\Scripts"
+          New-Item -ItemType Directory -Force $FakeScripts | Out-Null
+          Set-Content (Join-Path $env:CODEXLEAN_HOME ".codexlean-install") "managed"
+          Copy-Item "$env:SystemRoot\System32\where.exe" (Join-Path $FakeScripts "codexlean.exe")
+          $RemovalBlocked = $false
+          try { .\windows\uninstall.ps1 } catch { $RemovalBlocked = $true }
+          if (-not $RemovalBlocked) { throw "uninstaller ignored integration removal failure" }
+          if (-not (Test-Path $env:CODEXLEAN_HOME)) { throw "uninstaller deleted installation after failure" }
+          Remove-Item -Recurse -Force $env:CODEXLEAN_HOME
 
   package:
     runs-on: ubuntu-latest
@@ -75,13 +100,21 @@ jobs:
         with:
           python-version: "3.13"
           cache: pip
-      - name: Build wheel
+      - name: Build distributions
         run: |
-          python -m pip install build
-          python -m build --wheel
+          python -m pip install build twine
+          python -m build
+          python -m twine check dist/*
+          tar -tzf dist/codexlean-*.tar.gz | grep -E '/(linux/install.sh|windows/install.ps1)$'
       - name: Install and inspect wheel
         run: |
           python -m venv .venv-check
           .venv-check/bin/python -m pip install dist/codexlean-*.whl
           .venv-check/bin/codexlean --version
           .venv-check/bin/codexlean benchmark --profiles safe --output /tmp/benchmark.json
+      - name: Verify tracked checksums
+        run: sha256sum -c SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: codexlean-dist
+          path: dist/*
