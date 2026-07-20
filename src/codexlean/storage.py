@@ -8,8 +8,9 @@ import sqlite3
 import stat
 import time
 import zlib
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 from .models import CompressionStats
 
@@ -91,12 +92,17 @@ class ArtifactStore:
             conn.execute("DELETE FROM artifacts WHERE created_at < ?", (cutoff,))
             conn.execute("DELETE FROM runs WHERE created_at < ?", (cutoff,))
 
-    def _connect(self) -> sqlite3.Connection:
+    @contextmanager
+    def _connect(self) -> Iterator[sqlite3.Connection]:
         conn = sqlite3.connect(self.path)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA synchronous=NORMAL")
-        return conn
+        try:
+            with conn:
+                yield conn
+        finally:
+            conn.close()
 
     def _init_db(self) -> None:
         with self._connect() as conn:

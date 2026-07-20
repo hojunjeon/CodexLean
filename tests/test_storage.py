@@ -1,6 +1,17 @@
+import sqlite3
 from pathlib import Path
 
+import pytest
+
 from codexlean.storage import ArtifactStore
+
+
+def test_store_connections_close_after_context(tmp_path: Path):
+    store = ArtifactStore(tmp_path / "closed.sqlite3")
+    with store._connect() as conn:
+        conn.execute("SELECT 1").fetchone()
+    with pytest.raises(sqlite3.ProgrammingError):
+        conn.execute("SELECT 1")
 
 
 def test_exact_roundtrip_and_prefix_lookup(tmp_path: Path):

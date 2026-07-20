@@ -5,6 +5,8 @@
 - Added first-class `linux/` and `windows/` platform directories at the repository root; installers moved from `scripts/` to their platform folders.
 - Added isolated virtual-environment installers and matching uninstallers that do not modify system Python packages.
 - Added Linux installation smoke coverage and a Windows CI lane.
+- Fixed Windows timeout termination where `signal.SIGKILL` is unavailable.
+- Close every SQLite connection deterministically so Windows can remove temporary benchmark stores.
 - Kept one shared Python core to prevent platform implementations from drifting.
 
 ## 0.1.1 — 2026-07-10

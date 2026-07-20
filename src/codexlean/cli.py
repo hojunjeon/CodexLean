@@ -98,11 +98,13 @@ def _request(
     )
 
 
-def _stop_process(process: subprocess.Popen[bytes], signum: int) -> None:
+def _stop_process(
+    process: subprocess.Popen[bytes], signum: int, *, force: bool = False
+) -> None:
     try:
         if os.name != "nt":
             os.killpg(process.pid, signum)
-        elif signum == signal.SIGKILL:
+        elif force:
             process.kill()
         else:
             process.terminate()
@@ -140,7 +142,11 @@ def cmd_run(args: argparse.Namespace) -> int:
                 try:
                     process.wait(timeout=0.5)
                 except subprocess.TimeoutExpired:
-                    _stop_process(process, signal.SIGKILL)
+                    _stop_process(
+                        process,
+                        signal.SIGKILL if os.name != "nt" else signal.SIGTERM,
+                        force=True,
+                    )
                     process.wait()
                 exit_code = 124
                 timeout_note = f"codexlean: command timed out after {args.timeout}s".encode()
@@ -149,7 +155,11 @@ def cmd_run(args: argparse.Namespace) -> int:
                 try:
                     process.wait(timeout=0.5)
                 except subprocess.TimeoutExpired:
-                    _stop_process(process, signal.SIGKILL)
+                    _stop_process(
+                        process,
+                        signal.SIGKILL if os.name != "nt" else signal.SIGTERM,
+                        force=True,
+                    )
                     process.wait()
                 exit_code = 130
                 timeout_note = b"codexlean: interrupted"
