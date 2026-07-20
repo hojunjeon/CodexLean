@@ -10,11 +10,12 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,6 +26,46 @@ jobs:
         run: python -m pip install -e '.[test]'
       - name: Test
         run: pytest -q
+
+  platform-install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Linux install, smoke test, and uninstall
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          export CODEXLEAN_HOME="$RUNNER_TEMP/codexlean-home"
+          export CODEXLEAN_BIN_DIR="$RUNNER_TEMP/codexlean-bin"
+          export CODEXLEAN_SCOPE=project
+          export CODEXLEAN_PROJECT="$RUNNER_TEMP/codexlean-project"
+          mkdir -p "$CODEXLEAN_PROJECT"
+          ./linux/install.sh
+          "$CODEXLEAN_BIN_DIR/codexlean" --version
+          "$CODEXLEAN_BIN_DIR/codexlean" run -- python -c "print('linux-smoke-ok')"
+          ./linux/uninstall.sh
+          test ! -e "$CODEXLEAN_HOME"
+      - name: Windows install, smoke test, and uninstall
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:CODEXLEAN_HOME = Join-Path $env:RUNNER_TEMP "codexlean-home"
+          $env:CODEXLEAN_BIN_DIR = Join-Path $env:RUNNER_TEMP "codexlean-bin"
+          $env:CODEXLEAN_SCOPE = "project"
+          $env:CODEXLEAN_PROJECT = Join-Path $env:RUNNER_TEMP "codexlean-project"
+          New-Item -ItemType Directory -Force $env:CODEXLEAN_PROJECT | Out-Null
+          .\windows\install.ps1
+          & "$env:CODEXLEAN_BIN_DIR\codexlean.cmd" --version
+          & "$env:CODEXLEAN_BIN_DIR\codexlean.cmd" run -- python -c "print('windows-smoke-ok')"
+          .\windows\uninstall.ps1
+          if (Test-Path $env:CODEXLEAN_HOME) { throw "uninstall left CODEXLEAN_HOME behind" }
 
   package:
     runs-on: ubuntu-latest

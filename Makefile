@@ -14,5 +14,4 @@ build:
 	python3 -m build --wheel
 
 install:
-	python3 -m pip install .
-	codexlean install --scope user
+	./linux/install.sh

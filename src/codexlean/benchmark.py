@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+from . import __version__
 from .engine import CompressionEngine
 from .models import CompressionRequest, Profile
 from .quality import extract_critical_lines
@@ -279,7 +280,7 @@ def run_benchmark(profiles: Iterable[str] | None = None) -> dict:
     selected = [Profile(value) for value in (profiles or [p.value for p in Profile])]
     report: dict = {
         "tool": "codexlean",
-        "version": "0.1.1",
+        "version": __version__,
         "token_counter": tokenizer_name(),
         "profiles": {},
         "quality_failures": 0,

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "codexlean"
-version = "0.1.1"
+version = "0.2.0"
 description = "Conservative, reversible context compression for Codex CLI"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -28,9 +28,9 @@ tokens = ["tiktoken>=0.7"]
 benchmark = ["tiktoken-offline>=0.1.1"]
 
 [project.urls]
-Homepage = "https://github.com/hojunjeon/codexlean"
-Repository = "https://github.com/hojunjeon/codexlean"
-Issues = "https://github.com/hojunjeon/codexlean/issues"
+Homepage = "https://github.com/hojunjeon/CodexLean"
+Repository = "https://github.com/hojunjeon/CodexLean"
+Issues = "https://github.com/hojunjeon/CodexLean/issues"
 
 [project.scripts]
 codexlean = "codexlean.cli:main"

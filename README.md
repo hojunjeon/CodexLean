@@ -4,7 +4,7 @@ Codex와 코딩 에이전트가 읽는 **긴 터미널 출력을 보수적으로
 
 반복되는 테스트 성공 행, 대량 로그, JSON 배열, 검색 결과, 파일 트리, 진행률 출력은 형식별로 압축합니다. 반면 `git diff`, 민감정보 포함 출력, 짧은 출력처럼 손실 위험이 크거나 절감 효과가 없는 입력은 원문 그대로 통과시킵니다.
 
-> 현재 버전: **0.1.1 Beta**  
+> 현재 버전: **0.2.0 Beta**
 > 독립 오픈소스 유틸리티이며 OpenAI 공식 제품이 아닙니다.
 
 ## 핵심 결과
@@ -49,57 +49,46 @@ flowchart TD
 5. 압축 결과가 충분하지 않을 때 `codexlean show`로 전체 또는 필요한 구간만 조회합니다.
 6. 형식 신뢰도가 낮거나 저장·품질 검사에 실패하면 정보 손실 없이 원문으로 폴백합니다.
 
-## 설치
+## 플랫폼별 설치
+
+루트의 플랫폼 폴더에 설치·제거 파일과 전용 안내를 분리했습니다. 압축 엔진은 루트 `src/`를 공동으로 사용하므로 Linux와 Windows의 동작이 갈라지지 않습니다.
+
+| 플랫폼 | 설치 | 상세 안내 |
+|---|---|---|
+| Linux | `./linux/install.sh` | [`linux/README.md`](linux/README.md) |
+| Windows | `.\windows\install.ps1` | [`windows/README.md`](windows/README.md) |
+
+두 설치 프로그램 모두 전용 가상환경을 만들어 **시스템 Python을 변경하지 않습니다.**
 
 ### 요구 사항
 
 - Python **3.10 이상**
-- Linux, macOS 또는 Windows
+- Linux 또는 Windows
 - Codex 연동을 사용할 경우 Codex가 읽을 수 있는 `AGENTS.md` 및 `.agents/skills` 환경
 
-### 방법 1: 번들 Wheel 설치 — 권장
-
-저장소를 내려받은 뒤 포함된 설치 파일을 사용합니다.
+### Linux — 권장
 
 ```bash
-git clone https://github.com/hojunjeon/codexlean.git
-cd codexlean
-python3 -m pip install dist/codexlean-0.1.1-py3-none-any.whl
+git clone https://github.com/hojunjeon/CodexLean.git
+cd CodexLean
+./linux/install.sh
 ```
 
-Windows PowerShell:
+### Windows PowerShell — 권장
 
 ```powershell
-git clone https://github.com/hojunjeon/codexlean.git
-cd codexlean
-py -m pip install .\dist\codexlean-0.1.1-py3-none-any.whl
+git clone https://github.com/hojunjeon/CodexLean.git
+cd CodexLean
+.\windows\install.ps1
 ```
 
-### 방법 2: 설치 스크립트
+설치 프로그램은 전용 가상환경에 패키지를 설치하고 사용자 범위 Codex Skill을 구성한 뒤 `doctor`를 실행합니다.
 
-Linux 또는 macOS:
+### 개발용 소스 설치
 
 ```bash
-git clone https://github.com/hojunjeon/codexlean.git
-cd codexlean
-./scripts/install.sh
-```
-
-Windows PowerShell:
-
-```powershell
-git clone https://github.com/hojunjeon/codexlean.git
-cd codexlean
-.\scripts\install.ps1
-```
-
-설치 스크립트는 Wheel을 설치하고 사용자 범위 Codex Skill을 구성한 뒤 진단을 실행합니다.
-
-### 방법 3: 소스에서 설치
-
-```bash
-git clone https://github.com/hojunjeon/codexlean.git
-cd codexlean
+git clone https://github.com/hojunjeon/CodexLean.git
+cd CodexLean
 python3 -m pip install .
 ```
 
@@ -238,7 +227,7 @@ codexlean run --profile max -- rg 'pattern' .
 
 기본 원문 저장 위치:
 
-- Linux/macOS: `~/.cache/codexlean/artifacts.sqlite3`
+- Linux: `~/.cache/codexlean/artifacts.sqlite3`
 - Windows: `%LOCALAPPDATA%\CodexLean\artifacts.sqlite3`
 
 특성:
@@ -287,7 +276,8 @@ python3 benchmarks/cross_benchmark.py
 
 ## 검증 범위와 한계
 
-- Python 3.13/Linux에서 자동 테스트 **33개**를 통과했습니다.
+- Python 3.11/Linux에서 자동 테스트 **37개**와 격리 설치→실행→제거 smoke test를 통과했습니다.
+- GitHub Actions는 Python 3.10/3.13의 Linux·Windows 테스트와 두 플랫폼 설치 smoke test를 실행합니다.
 - Wheel 설치, CLI 버전, Codex Skill 설치·진단, 명령 종료 코드, 부분 타임아웃 출력, 원문 바이트 복구를 검증합니다.
 - 15개 교차 코퍼스에서 엄격 1차 품질 게이트 **15/15**, 정확 원문 가용 **15/15**를 확인했습니다.
 - 합성 벤치마크 통과가 모든 저장소와 미래 작업의 무회귀를 증명하지는 않습니다.
@@ -297,26 +287,27 @@ python3 benchmarks/cross_benchmark.py
 
 ## 제거
 
-사용자 범위:
+Linux:
 
 ```bash
-codexlean uninstall --scope user
-python3 -m pip uninstall codexlean
+./linux/uninstall.sh
 ```
 
-프로젝트 범위:
+Windows PowerShell:
 
-```bash
-codexlean uninstall --scope project --project /path/to/repository
+```powershell
+.\windows\uninstall.ps1
 ```
+
+플랫폼 설치 프로그램을 사용하지 않은 개발용 설치는 `codexlean uninstall --scope user` 후 해당 Python 환경에서 `python -m pip uninstall codexlean`으로 제거합니다.
 
 ## 프로젝트 구조
 
 ```text
+linux/                Linux 설치·제거 및 사용 안내
+windows/              Windows 설치·제거 및 사용 안내
 src/codexlean/       핵심 엔진, 필터, 저장소, CLI
 skills/codexlean/    Codex Skill 원본
-scripts/             Linux/macOS 및 Windows 설치 스크립트
-dist/                설치용 Wheel
 benchmarks/          내장·교차 벤치마크와 결과
 tests/               자동 테스트
 docs/                설계, 연구, 검증 문서와 차트
