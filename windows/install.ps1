@@ -8,8 +8,8 @@ $Venv = Join-Path $InstallHome "venv"
 $Marker = Join-Path $InstallHome ".codexlean-install"
 $Python = Join-Path $Venv "Scripts\python.exe"
 $CodexLean = Join-Path $Venv "Scripts\codexlean.exe"
-$CmdPath = Join-Path $BinDir "codexlean.cmd"
-$LauncherMarker = "$CmdPath.codexlean-owned"
+$LauncherPath = Join-Path $BinDir "codexlean.cmd"
+$LauncherMarker = "$LauncherPath.codexlean-owned"
 $CmdText = "@echo off`r`n`"$CodexLean`" %*`r`n"
 $Scope = if ($env:CODEXLEAN_SCOPE) { $env:CODEXLEAN_SCOPE } else { "user" }
 if ($Scope -notin @("user", "project")) { throw "CODEXLEAN_SCOPE must be user or project." }
@@ -20,12 +20,12 @@ if ($InstallFullPath -eq $InstallRoot) { throw "Refusing to use a drive root as 
 if ((Test-Path $InstallHome) -and -not (Test-Path $Marker -PathType Leaf)) {
     throw "Refusing to overwrite unrecognized directory: $InstallHome"
 }
-if (Test-Path $CmdPath) {
-    $OwnedLauncher = (Get-Content $CmdPath -Raw) -eq $CmdText
+if (Test-Path $LauncherPath) {
+    $OwnedLauncher = (Get-Content $LauncherPath -Raw) -eq $CmdText
     if (Test-Path $LauncherMarker -PathType Leaf) {
         $OwnedLauncher = $OwnedLauncher -or ((Get-Content $LauncherMarker -Raw).Trim() -eq $CodexLean)
     }
-    if (-not $OwnedLauncher) { throw "Refusing to replace unrelated launcher: $CmdPath" }
+    if (-not $OwnedLauncher) { throw "Refusing to replace unrelated launcher: $LauncherPath" }
 }
 
 $Launcher = Get-Command py -ErrorAction SilentlyContinue
@@ -40,7 +40,7 @@ if ($LASTEXITCODE -ne 0) { throw "Failed to create the CodexLean virtual environ
 & $Python -m pip install --disable-pip-version-check $Root
 if ($LASTEXITCODE -ne 0) { throw "Failed to install CodexLean." }
 
-[IO.File]::WriteAllText($CmdPath, $CmdText, [Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText($LauncherPath, $CmdText, [Text.UTF8Encoding]::new($false))
 [IO.File]::WriteAllText($LauncherMarker, "$CodexLean`r`n", [Text.UTF8Encoding]::new($false))
 
 $IntegrationArgs = @("install", "--scope", $Scope)
@@ -57,4 +57,4 @@ if ($Scope -eq "project") { $DoctorArgs += @("--project", $Project) }
 if ($LASTEXITCODE -ne 0) { throw "CodexLean doctor failed." }
 
 Write-Host "Installed CodexLean in $Venv"
-Write-Host "Launcher: $CmdPath"
+Write-Host "Launcher: $LauncherPath"
