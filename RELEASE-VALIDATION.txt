@@ -1,28 +1,34 @@
-CodexLean 0.1.1 release validation
-Date: 2026-07-10
-Platform: Linux-4.4.0-x86_64-with-glibc2.41
-Build Python: Python 3.13.5
-Installed CLI: codexlean 0.1.1
-Source tests: 33 passed
-Python compileall: pass
+CodexLean 0.2.0 release validation
+Date: 2026-07-21
+Validated commit: eb6cf1852b56fce4f535f0e7d36f6815176f6231
+Local platform: Linux 6.8.0-1054-oracle aarch64
+Local Python: Python 3.11.15
+Installed CLI: codexlean 0.2.0
+Source tests: 41 passed
+Python compile/build backend: pass
+Wheel and sdist build: pass
+Twine metadata check: pass
 Wheel clean-venv install: pass
 Wheel pip check: No broken requirements found.
 Wheel bundled Skill files: pass
-Project Skill install/doctor: pass
-  [OK] Python: 3.13.5
-  [OK] codexlean on PATH
-  [OK] project .agents/skills/codexlean
-  [OK] managed AGENTS.md guidance
-Wrapped failing exit code: 7 (expected 7)
-Decisive error retained: pass
-Exact artifact byte recovery: pass
+Source distribution Linux/Windows entrypoints: pass
+Shared Skill drift gate: pass
+Linux real installer/version/run/uninstaller: pass
+Linux unrelated-launcher collision refusal: pass
+Windows real installer/version/run/uninstaller: pass
+Windows unrelated-launcher collision refusal: pass
+Windows integration-removal failure preserves installation: pass
+Wrapped exit code and timeout behavior: pass on Linux and Windows
+SQLite deterministic close and temporary-store cleanup: pass on Linux and Windows
+Caller-owned storage-directory permissions preserved: pass
 Built-in benchmark quality failures: 0
 Built-in safe benchmark exact-byte saving: 88.0%
 Built-in safe benchmark cl100k token saving: 87.1%
 Cross benchmark: 102,489 -> 14,723 cl100k tokens (85.635% saved)
 Cross benchmark strict visible gates: 15/15
 Cross benchmark exact original availability: 15/15
-Search regression anchor src/auth.py:77 + validate_expiry: pass
-Sensitive-output persistence violations: 0
-Authenticated Codex end-to-end session: not available in build environment
+Tracked SHA256SUMS: all entries pass
+GitHub Actions jobs: 7/7 success
+GitHub Actions run: https://github.com/hojunjeon/CodexLean/actions/runs/29786586222
+Authenticated Codex end-to-end session: not available in the build environment
 Provider-reported billing token A/B: not measured
