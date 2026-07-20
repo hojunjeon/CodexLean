@@ -69,7 +69,7 @@ jobs:
           $env:CODEXLEAN_PROJECT = Join-Path $env:RUNNER_TEMP "codexlean-project"
           New-Item -ItemType Directory -Force $env:CODEXLEAN_PROJECT, $env:CODEXLEAN_BIN_DIR | Out-Null
           $UnrelatedLauncher = Join-Path $env:CODEXLEAN_BIN_DIR "codexlean.cmd"
-          Set-Content -NoNewline $UnrelatedLauncher "unrelated"
+          Set-Content -Path $UnrelatedLauncher -Value "unrelated" -NoNewline
           if (-not [IO.File]::Exists($UnrelatedLauncher)) { throw "collision fixture was not created" }
           if (([IO.File]::ReadAllText($UnrelatedLauncher)) -ne "unrelated") { throw "collision fixture is invalid" }
           try {
