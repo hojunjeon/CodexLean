@@ -19,8 +19,11 @@ if ($InstallFullPath -eq $InstallRoot) { throw "Refusing to use a drive root as 
 if ((Test-Path $InstallHome) -and -not (Test-Path $Marker -PathType Leaf)) {
     throw "Refusing to overwrite unrecognized directory: $InstallHome"
 }
-if ((Test-Path $CmdPath) -and -not (Get-Content $CmdPath -Raw).Contains($ExpectedLauncher)) {
-    throw "Refusing to replace unrelated launcher: $CmdPath"
+if (Test-Path $CmdPath) {
+    $ExistingLauncher = Get-Content $CmdPath -Raw
+    if (-not $ExistingLauncher.Contains($ExpectedLauncher)) {
+        throw "Refusing to replace unrelated launcher: $CmdPath"
+    }
 }
 
 $Launcher = Get-Command py -ErrorAction SilentlyContinue
