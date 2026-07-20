@@ -20,9 +20,9 @@ if ($InstallFullPath -eq $InstallRoot) { throw "Refusing to use a drive root as 
 if ((Test-Path $InstallHome) -and -not (Test-Path $Marker -PathType Leaf)) {
     throw "Refusing to overwrite unrecognized directory: $InstallHome"
 }
-if (Test-Path $LauncherPath) {
+if ([IO.File]::Exists($LauncherPath)) {
     $OwnedLauncher = (Get-Content $LauncherPath -Raw) -eq $CmdText
-    if (Test-Path $LauncherMarker -PathType Leaf) {
+    if ([IO.File]::Exists($LauncherMarker)) {
         $OwnedLauncher = $OwnedLauncher -or ((Get-Content $LauncherMarker -Raw).Trim() -eq $CodexLean)
     }
     if (-not $OwnedLauncher) { throw "Refusing to replace unrelated launcher: $LauncherPath" }

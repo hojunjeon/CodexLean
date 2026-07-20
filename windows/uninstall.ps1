@@ -28,14 +28,14 @@ if (Test-Path $CodexLean) {
     if ($LASTEXITCODE -ne 0) { throw "Codex integration removal failed." }
 }
 
-if (Test-Path $LauncherPath) {
+if ([IO.File]::Exists($LauncherPath)) {
     $OwnedLauncher = (Get-Content $LauncherPath -Raw) -eq $ExpectedLauncher
-    if (Test-Path $LauncherMarker -PathType Leaf) {
+    if ([IO.File]::Exists($LauncherMarker)) {
         $OwnedLauncher = $OwnedLauncher -or ((Get-Content $LauncherMarker -Raw).Trim() -eq $CodexLean)
     }
     if ($OwnedLauncher) {
         Remove-Item -Force $LauncherPath
-        if (Test-Path $LauncherMarker) { Remove-Item -Force $LauncherMarker }
+        if ([IO.File]::Exists($LauncherMarker)) { Remove-Item -Force $LauncherMarker }
     }
 }
 if (Test-Path $InstallHome) { Remove-Item -Recurse -Force $InstallHome }

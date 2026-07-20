@@ -70,6 +70,8 @@ jobs:
           New-Item -ItemType Directory -Force $env:CODEXLEAN_PROJECT, $env:CODEXLEAN_BIN_DIR | Out-Null
           $UnrelatedLauncher = Join-Path $env:CODEXLEAN_BIN_DIR "codexlean.cmd"
           Set-Content -NoNewline $UnrelatedLauncher "unrelated"
+          if (-not [IO.File]::Exists($UnrelatedLauncher)) { throw "collision fixture was not created" }
+          if (([IO.File]::ReadAllText($UnrelatedLauncher)) -ne "unrelated") { throw "collision fixture is invalid" }
           try {
             & .\windows\install.ps1
             throw "UNEXPECTED_INSTALL_SUCCESS"
